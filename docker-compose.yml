@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9090:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    entrypoint: ./wait-for-it.sh db:3306 -- apache2-foreground  # Asegúrate de que esto sea correcto
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: abimael
+      MYSQL_DATABASE: midb
+      #MYSQL_USER: root
+      #MYSQL_PASSWORD: abimael
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql  # Montaje del volumen de datos
+      - ./SCRIPT.sql:/docker-entrypoint-initdb.d/SCRIPT.sql  # Montar el archivo SQL para inicializar la BD
+
+volumes:
+  db_data: {}  # Definición de volumen vacía
+
